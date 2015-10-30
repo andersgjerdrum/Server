@@ -1,21 +1,12 @@
-#include <iostream>
 
-#ifdef WIN32
-
-#include <winsock.h>
-#pragma comment(lib, "Ws2_32.lib")
-
-#elif __linux__
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#endif
-
-namespace MifuneCore {
+#include "socket.h"
 
 
-	int OpenSocket()
+namespace MifuneCore
+{
+
+
+	void  Socket::OpenSocket()
 	{
 
 #ifdef WIN32
@@ -25,76 +16,101 @@ namespace MifuneCore {
 
 #endif
 
-		int thisSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (thisSocket < 0)
-		{
-			printf("\nSocket Creation FAILED!");
-			return 0;
-		}
+		this->socketDescriptor = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	}
 
-	int ListenSocket(int thisSocket)
+	void Socket::ListenSocket()
 	{
-		printf("\nListening on 13374...");
-		if (listen(thisSocket, 5) < 0)
+		if (listen(this->socketDescriptor, 5) < 0)
 		{
-			printf("\nListening on Socket FAILED!\n");
-			if (thisSocket)
+			if (this->socketDescriptor)
 			{
-				CloseSocket(thisSocket);
+				CloseSocket();
 			}
-			return -1;
 		}
-		return 0;
 	}
 
 
-	void CloseSocket(int thisSocket)
+
+	Socket::Socket(int socket, sockaddr_in clientAddress)
+	{
+		this->socketDescriptor = socket, this->clientAddress = clientAddress;
+	}
+
+	Socket::Socket()
+	{
+	}
+
+	void  Socket::CloseSocket()
 	{
 
 #ifdef WIN32
-		closesocket(thisSocket);
+		closesocket(this->socketDescriptor);
 		WSACleanup();
 
 #elif __linux__
-		close(thisSocket);
+		close(this->socketDescriptor);
 #endif
 
 	}
 
-	int BindSocket(int thisSocket)
+	void Socket::Connect(wchar_t ipAddr, int port)
+	{
+		struct sockaddr_in destination;
+		destination.sin_port = htons(13374);
+		destination.sin_addr.s_addr = inet_addr("127.0.0.1");
+		if (connect(this->socketDescriptor, (struct sockaddr *)&destination, sizeof(destination)) != 0)
+		{
+			if (this->socketDescriptor)
+			{
+				CloseSocket();
+			}
+		}
+		this->clientAddress = destination;
+	}
+
+	void Socket::Send(char *buffer, int startaddr, int buffersize)
+	{
+		send(this->socketDescriptor, buffer, buffersize, startaddr);
+	}
+
+	void Socket::Recieve(char* buffer, int startaddr, int buffersize)
+	{
+		recv(this->socketDescriptor, buffer, buffersize, startaddr);
+	}
+
+	void  Socket::BindSocket(unsigned int port)
 	{
 		struct sockaddr_in destination;
 		destination.sin_family = AF_INET;
-		destination.sin_port = htons(13374);
+		destination.sin_port = htons(port);
 		destination.sin_addr.s_addr = INADDR_ANY;
-		if (bind(thisSocket, (struct sockaddr *)&destination, sizeof(destination)) < 0)
+		if (bind(this->socketDescriptor, (struct sockaddr *)&destination, sizeof(destination)) < 0)
 		{
-			printf("\nBinding Socket FAILED!\n");
-			if (thisSocket)
+			if (this->socketDescriptor)
 			{
-				CloseSocket(thisSocket);
+				CloseSocket();
 			}
-			return -1;
 		}
-		return 0;
 	}
 
-	int AcceptSocket(int thisSocket, sockaddr_in clientAddress)
+	ISocket& Socket::AcceptSocket()
 	{
+		struct sockaddr_in  clientAddress;
 		int clientSize = sizeof(clientAddress);
-		thisSocket = accept(thisSocket, (struct sockaddr *)&clientAddress, (int *)&clientSize);
 
-		if (thisSocket < 0)
+		int socketDescriptor = accept(this->socketDescriptor, (struct sockaddr *)&clientAddress, (int *)&clientSize);
+
+		if (this->socketDescriptor < 0)
 		{
-			printf("\nSocket Connection FAILED!\n");
-			if (thisSocket)
+			if (this->socketDescriptor)
 			{
-				CloseSocket(thisSocket);
+				CloseSocket();
 			}
-			return -1;
 		}
-		return 0;
-		printf("\nConnection Established!");
+
+		Socket Socket(socketDescriptor, clientAddress);
+
+		return Socket;
 	}
 }
