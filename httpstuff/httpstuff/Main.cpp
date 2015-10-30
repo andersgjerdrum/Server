@@ -3,6 +3,7 @@
 #include <thread>
 #include "socket.h"
 #include "ISocket.h"
+#include "ThreadPool.h"
 
 /*
 Inspiration: http://www.techpowerup.com/forums/threads/c-c-sockets-faq-and-how-to-win-linux.56901/
@@ -11,34 +12,35 @@ http://stackoverflow.com/questions/873978/c-simple-server-which-sends-simple-htm
 
 https://code.google.com/p/mongoose/
 */
-void ServerThread(MifuneCore::ISocket &sock, std::map<unsigned int, MifuneCore::ISocket&> sessions);
+using namespace MifuneCore;
+void ServerThread();
 
 int main()
 {
 	auto x = R"(Hello world!)";
 	std::cout << x;
+	ThreadPool threadpool(2);
+	threadpool.enqueue(std::function<void()>(ServerThread));
 
+
+	return 0;
+}
+
+void ServerThread(void)
+{
 	MifuneCore::Socket sock;
 	sock.OpenSocket();
 
 	sock.BindSocket(13374);
-	std::map<unsigned int, MifuneCore::ISocket&> sessions;
-
-	std::thread t1(ServerThread, sock, sessions);
-
-	t1.join();
-	sock.CloseSocket();
-	return 0;
-}
-
-void ServerThread(MifuneCore::ISocket &sock, std::map<unsigned int, MifuneCore::ISocket&> sessions)
-{
+	std::map<unsigned int, ISocket&> sessions;
 	unsigned int sessionNumber = 0;
 	while (true)
 	{
 		sock.ListenSocket();
-		sessions.insert(std::pair<unsigned int, MifuneCore::ISocket&>(sessionNumber++, sock.AcceptSocket()));
+		sessions.insert(std::pair<unsigned int, ISocket&>(sessionNumber++, sock.AcceptSocket()));
 		auto x = R"(I got the session)";
 		std::cout << x;
 	}
+	sock.CloseSocket();
+
 }

@@ -12,10 +12,8 @@
 #include <arpa/inet.h>
 #endif
 #include "ISocket.h"
-
 namespace MifuneCore 
 {
-
 	class Socket : public ISocket
 	{
 		sockaddr_in clientAddress;

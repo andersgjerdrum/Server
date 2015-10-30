@@ -1,5 +1,4 @@
 #include "ThreadPool.h"
-
 namespace MifuneCore 
 {
 
