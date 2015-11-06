@@ -42,16 +42,4 @@ namespace MifuneCore
 			workers[i].join();
 		}
 	}
-
-	template<class F>
-	void ThreadPool::enqueue(F f) 
-	{
-		{ 
-			std::unique_lock<std::mutex> lock(queue_mutex);
-
-			tasks.push_back(std::function<void()>(f));
-		}
-
-		condition.notify_one();
-	}
 }

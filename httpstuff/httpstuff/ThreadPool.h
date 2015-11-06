@@ -30,4 +30,16 @@ namespace MifuneCore {
 		std::condition_variable condition;
 		bool stop;
 	};
+
+	template<class F>
+	void ThreadPool::enqueue(F f)
+	{
+		{
+			std::unique_lock<std::mutex> lock(queue_mutex);
+
+			tasks.push_back(std::function<void()>(f));
+		}
+
+		condition.notify_one();
+	}
 }

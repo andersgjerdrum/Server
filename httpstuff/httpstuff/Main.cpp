@@ -20,9 +20,12 @@ int main()
 	auto x = R"(Hello world!)";
 	std::cout << x;
 	ThreadPool threadpool(2);
-	threadpool.enqueue(std::function<void()>(ServerThread));
+	threadpool.enqueue([]
+	{
+		ServerThread();
+	});
 
-
+	std::cin.get();
 	return 0;
 }
 
@@ -30,7 +33,8 @@ void ServerThread(void)
 {
 	MifuneCore::Socket sock;
 	sock.OpenSocket();
-
+	auto x = R"(entered server)";
+	std::cout << x;
 	sock.BindSocket(13374);
 	std::map<unsigned int, ISocket&> sessions;
 	unsigned int sessionNumber = 0;
