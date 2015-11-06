@@ -1,4 +1,6 @@
 #include <iostream>
+#include <atomic>
+#include <memory>
 #include <map>
 #include <thread>
 #include "socket.h"
@@ -13,38 +15,62 @@ http://stackoverflow.com/questions/873978/c-simple-server-which-sends-simple-htm
 https://code.google.com/p/mongoose/
 */
 using namespace MifuneCore;
-void ServerThread();
+
+void ServerThread(std::shared_ptr<std::map<unsigned int, ISocket&>> sessions, CancelationToken canceled);
+void ConnectionHandler(CancelationToken canceled);
+
 
 int main()
 {
 	auto x = R"(Hello world!)";
 	std::cout << x;
 	ThreadPool threadpool(2);
-	threadpool.enqueue([]
+	std::shared_ptr<std::map<unsigned int, ISocket&>> sessions(new std::map<unsigned int, ISocket&>);
+	CancelationToken canceled;
+
+	threadpool.enqueue([sessions, canceled]
 	{
-		ServerThread();
+		ServerThread(sessions, canceled);
+	});
+
+	threadpool.enqueue([canceled]
+	{
+		ConnectionHandler(canceled);
 	});
 
 	std::cin.get();
+
+	canceled.Cancel();
 	return 0;
 }
 
-void ServerThread(void)
+void ConnectionHandler(CancelationToken canceled)
+{
+	while (!canceled.IsCanceled())
+	{
+		
+	}
+	auto x = R"(canceled con)";
+	std::cout << x;
+}
+
+void ServerThread(std::shared_ptr<std::map<unsigned int, ISocket&>> sessions, CancelationToken canceled)
 {
 	MifuneCore::Socket sock;
 	sock.OpenSocket();
 	auto x = R"(entered server)";
 	std::cout << x;
 	sock.BindSocket(13374);
-	std::map<unsigned int, ISocket&> sessions;
 	unsigned int sessionNumber = 0;
-	while (true)
+	while (!canceled.IsCanceled())
 	{
 		sock.ListenSocket();
-		sessions.insert(std::pair<unsigned int, ISocket&>(sessionNumber++, sock.AcceptSocket()));
+		sessions->insert(std::pair<unsigned int, ISocket&>(sessionNumber++, sock.AcceptSocket()));
 		auto x = R"(I got the session)";
 		std::cout << x;
 	}
 	sock.CloseSocket();
 
+	x = R"(canceled)";
+	std::cout << x;
 }
