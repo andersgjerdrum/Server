@@ -6,6 +6,7 @@
 #include "socket.h"
 #include "ISocket.h"
 #include "ThreadPool.h"
+#include "CLFQueue.h"
 
 /*
 Inspiration: http://www.techpowerup.com/forums/threads/c-c-sockets-faq-and-how-to-win-linux.56901/

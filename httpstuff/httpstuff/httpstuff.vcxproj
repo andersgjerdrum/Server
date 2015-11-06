@@ -83,6 +83,7 @@
     <ClCompile Include="ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CLFQueue.h" />
     <ClInclude Include="ISocket.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="ThreadPool.h" />
