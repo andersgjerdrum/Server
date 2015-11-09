@@ -23,11 +23,11 @@ namespace MifuneCore
 		Socket();
 		void CloseSocket();
 		void Connect(wchar_t ipAddr, int port);
-		void Send(char * buffer, int startaddr, int buffersize);
-		void Recieve(char * buffer, int startaddr, int buffersize);
+		int Send(char * buffer, int startaddr, int buffersize);
+		int Recieve(char * buffer, int startaddr, int buffersize);
 		void BindSocket(unsigned int port);
 		void OpenSocket();
 		void ListenSocket();
-		ISocket& AcceptSocket();
+		ISocket* AcceptSocket();
 	};
 }

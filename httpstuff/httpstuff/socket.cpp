@@ -69,14 +69,14 @@ namespace MifuneCore
 		this->clientAddress = destination;
 	}
 
-	void Socket::Send(char *buffer, int startaddr, int buffersize)
+	int Socket::Send(char *buffer, int startaddr, int buffersize)
 	{
-		send(this->socketDescriptor, buffer, buffersize, startaddr);
+		return send(this->socketDescriptor, buffer, buffersize, startaddr);
 	}
 
-	void Socket::Recieve(char* buffer, int startaddr, int buffersize)
+	int Socket::Recieve(char* buffer, int startaddr, int buffersize)
 	{
-		recv(this->socketDescriptor, buffer, buffersize, startaddr);
+ 		return recv(this->socketDescriptor, buffer, buffersize, startaddr);
 	}
 
 	void  Socket::BindSocket(unsigned int port)
@@ -94,7 +94,7 @@ namespace MifuneCore
 		}
 	}
 
-	ISocket& Socket::AcceptSocket()
+	ISocket* Socket::AcceptSocket()
 	{
 		struct sockaddr_in  clientAddress;
 		int clientSize = sizeof(clientAddress);
@@ -109,8 +109,7 @@ namespace MifuneCore
 			}
 		}
 
-		Socket Socket(socketDescriptor, clientAddress);
 
-		return Socket;
+		return new Socket(socketDescriptor, clientAddress);
 	}
 }
