@@ -17,31 +17,58 @@ https://code.google.com/p/mongoose/
 */
 using namespace MifuneCore;
 
-void ServerThread(std::shared_ptr<std::map<unsigned int, ISocket&>> sessions, CancelationToken canceled);
+void ServerThread(CancelationToken canceled);
 void ConnectionHandler(CancelationToken canceled);
 
+static LockFreeQueue<std::pair<unsigned int, ISocket&>> *RequestChannelQueue;
+static ThreadPool *requestchannelThreadpool;
 
-int main()
+void initializeWebServer(int threadpoolsize) 
 {
-	auto x = R"(Hello world!)";
-	std::cout << x;
-	ThreadPool threadpool(2);
-	std::shared_ptr<std::map<unsigned int, ISocket&>> sessions(new std::map<unsigned int, ISocket&>);
+	requestchannelThreadpool = new ThreadPool(threadpoolsize);
+	RequestChannelQueue = new LockFreeQueue<std::pair<unsigned int, ISocket&>>(1, threadpoolsize);
+}
+
+CancelationToken startWebServer()
+{
 	CancelationToken canceled;
 
-	threadpool.enqueue([sessions, canceled]
+	requestchannelThreadpool->enqueue([canceled]
 	{
-		ServerThread(sessions, canceled);
+		ServerThread(canceled);
 	});
 
-	threadpool.enqueue([canceled]
+	requestchannelThreadpool->enqueue([canceled]
 	{
 		ConnectionHandler(canceled);
 	});
+	return canceled;
+}
+
+void stopWebServer(CancelationToken canceled)
+{
+	canceled.Cancel();
+}
+
+void cleanUpWebServer() 
+{
+	delete requestchannelThreadpool;
+	delete RequestChannelQueue;
+}
+
+int main()
+{
+
+	initializeWebServer(10);
+	auto x = R"(Hello world!)";
+	std::cout << x;
+
+	CancelationToken canceled = startWebServer();
 
 	std::cin.get();
+	stopWebServer(canceled);
+	cleanUpWebServer();
 
-	canceled.Cancel();
 	return 0;
 }
 
@@ -49,15 +76,20 @@ void ConnectionHandler(CancelationToken canceled)
 {
 	while (!canceled.IsCanceled())
 	{
-		
+		auto item = RequestChannelQueue->pop();
+		if (item != nullptr) {
+			auto x = R"(popped item)";
+			std::cout << x;
+		}
 	}
 	auto x = R"(canceled con)";
 	std::cout << x;
 }
 
-void ServerThread(std::shared_ptr<std::map<unsigned int, ISocket&>> sessions, CancelationToken canceled)
+
+void ServerThread(CancelationToken canceled)
 {
-	MifuneCore::Socket sock;
+	Socket sock;
 	sock.OpenSocket();
 	auto x = R"(entered server)";
 	std::cout << x;
@@ -66,8 +98,8 @@ void ServerThread(std::shared_ptr<std::map<unsigned int, ISocket&>> sessions, Ca
 	while (!canceled.IsCanceled())
 	{
 		sock.ListenSocket();
-		sessions->insert(std::pair<unsigned int, ISocket&>(sessionNumber++, sock.AcceptSocket()));
-		auto x = R"(I got the session)";
+		RequestChannelQueue->push(new std::pair<unsigned int, ISocket&>(sessionNumber++, sock.AcceptSocket()));
+		auto x = R"(pushed item)";
 		std::cout << x;
 	}
 	sock.CloseSocket();
