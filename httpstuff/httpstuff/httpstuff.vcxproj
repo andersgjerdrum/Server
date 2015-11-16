@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLFQueue.h" />
+    <ClInclude Include="httpstructs.h" />
     <ClInclude Include="ISocket.h" />
     <ClInclude Include="socket.h" />
     <ClInclude Include="ThreadPool.h" />

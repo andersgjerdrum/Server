@@ -6,6 +6,7 @@
 #include "socket.h"
 #include "ISocket.h"
 #include "ThreadPool.h"
+#include "httpstructs.h"
 #include "CLFQueue.h"
 
 /*
@@ -80,13 +81,14 @@ void ConnectionHandler(CancelationToken canceled)
 		auto socket = item->second;
 		auto x = R"(popped item)";
 		std::cout << x;
-		char recvbuff[1024];
-		while(int bytes = socket->Recieve(recvbuff, 0, 1024))
-		{
-			char man(bytes);
-			memcpy(&man, recvbuff, bytes);
-			std::cout << &man;
-		}
+		char recvbuff[8092];
+		int bytes = socket->Recieve(recvbuff, 0, 8092);
+		char man(bytes);
+		memcpy(&man, recvbuff, bytes);
+		std::cout << &man;
+		x = R"(Recieved)";
+		std::cout << x;
+		
 	}
 	auto x = R"(canceled con)";
 	std::cout << x;
