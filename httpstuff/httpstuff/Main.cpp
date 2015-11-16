@@ -83,9 +83,9 @@ void ConnectionHandler(CancelationToken canceled)
 		std::cout << x;
 		char recvbuff[8092];
 		int bytes = socket->Recieve(recvbuff, 0, 8092);
-		char man(bytes);
-		memcpy(&man, recvbuff, bytes);
-		std::cout << &man;
+		string str(recvbuff);
+		httprequest req(str);
+		std::cout << str;
 		x = R"(Recieved)";
 		std::cout << x;
 		
