@@ -63,7 +63,7 @@ namespace MifuneCore
 
 	public:
 		std::map<string, string> RawHeaderFields;
-		httprequest(string buffer) :Raw(buffer)
+		httprequest(string buffer)
 		{
 			parse(buffer);
 		}

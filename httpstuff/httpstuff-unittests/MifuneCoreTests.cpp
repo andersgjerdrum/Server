@@ -1,11 +1,16 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "..\httpstuff\httpstructs.h"
+#include "..\httpstuff\ThreadPool.h"
+#include <atomic>
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 using namespace MifuneCore;
 namespace httpstuffunittests
 {		
+	static std::atomic<int> cnt = ATOMIC_VAR_INIT(0);
+
 	TEST_CLASS(MifuneCoreTests)
 	{
 	public:
@@ -39,6 +44,23 @@ X-Forwarded-For: 192.168.10.1
 			Assert::IsTrue(req.RawHeaderFields[HttpHeaderField::PragmaFieldName].compare("no-cache") == 0, L"PragmaFieldName should be equal");
 			Assert::IsTrue(req.RawHeaderFields[HttpHeaderField::CacheControlFieldName].compare("no-cache") == 0, L"CacheControlFieldName should be equal");
 			Assert::IsTrue(req.RawHeaderFields[HttpHeaderField::XForwardForFieldName].compare("192.168.10.1") == 0, L"XForwardForFieldName should be equal");
+		}
+
+		TEST_METHOD(threadpooltest) 
+		{
+
+			ThreadPool *thrdpl = new ThreadPool(10);
+			for (int i = 0; i < 100; i++) 
+			{
+				thrdpl->enqueue([]
+				{
+					std::atomic_fetch_add(&cnt, 1);
+				});
+			}
+			delete thrdpl;
+
+			Assert::AreEqual(cnt.load(), 100);
+
 		}
 	};
 }
