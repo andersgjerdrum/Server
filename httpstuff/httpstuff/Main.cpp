@@ -57,13 +57,14 @@ void cleanUpWebServer()
 	delete RequestChannelQueue;
 }
 
+
 int main()
 {
 
 	initializeWebServer(10);
 	auto x = R"(Hello world!)";
 	std::cout << x;
-
+	
 	CancelationToken canceled = startWebServer();
 
 	std::cin.get();
@@ -88,7 +89,6 @@ void ConnectionHandler(CancelationToken canceled)
 		std::cout << str;
 		x = R"(Recieved)";
 		std::cout << x;
-		
 	}
 	auto x = R"(canceled con)";
 	std::cout << x;
