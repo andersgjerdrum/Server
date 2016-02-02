@@ -57,7 +57,10 @@ X-Forwarded-For: 192.168.10.1
 					std::atomic_fetch_add(&cnt, 1);
 				});
 			}
+			//wait for queue drainage
+			_sleep(1000);
 			delete thrdpl;
+
 
 			Assert::AreEqual(cnt.load(), 100);
 

@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpstuff", "httpstuff\httpstuff.vcxproj", "{6FAA42CE-009E-46ED-9E78-E4D76163E101}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpstuff-unittests", "httpstuff-unittests\httpstuff-unittests.vcxproj", "{A6E7CAD3-B2D6-4373-BACB-5685F0527FD7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "http-lib", "http-lib\http-lib.vcxproj", "{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,14 @@ Global
 		{A6E7CAD3-B2D6-4373-BACB-5685F0527FD7}.Release|Win32.Build.0 = Release|Win32
 		{A6E7CAD3-B2D6-4373-BACB-5685F0527FD7}.Release|x64.ActiveCfg = Release|x64
 		{A6E7CAD3-B2D6-4373-BACB-5685F0527FD7}.Release|x64.Build.0 = Release|x64
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Debug|Win32.Build.0 = Debug|Win32
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Debug|x64.ActiveCfg = Debug|x64
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Debug|x64.Build.0 = Debug|x64
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Release|Win32.ActiveCfg = Release|Win32
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Release|Win32.Build.0 = Release|Win32
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Release|x64.ActiveCfg = Release|x64
+		{F77CB92D-87C4-472D-AE09-EFD42EBA0E46}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
