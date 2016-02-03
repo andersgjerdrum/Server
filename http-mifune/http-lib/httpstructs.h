@@ -33,23 +33,46 @@ namespace MifuneCore
 
 
 	};
+	enum HttpRequestMethodType {
+		GET,
+		POST,
+		PUT
+	};
+
 
 	class httprequest 
 	{	
 	private:
-		string Get;
+		
 		void parse(string buffer) 
 		{
 			std::stringstream stream(buffer);
+			ExtractRequestLine(stream);
 			string pch;
-			std::getline(stream, pch);
-			Get = pch;
+			int CurrentByte = 0;
 
+			//read headers
+			//TODO: support content length and transfer encoding
 			while (std::getline(stream, pch))
 			{
+				//if not header read the rest to body
+				if (pch.find(":") == string::npos) {
+					body = buffer.substr(CurrentByte);
+					break;
+				}
 				PutField(pch);
+				CurrentByte = stream.tellg();
 			}
+		}
+		void ExtractRequestLine(std::stringstream &stream) {
+			string pch;
+			std::getline(stream, pch);
+			int first_separator = pch.find_first_of(' ');
+			int second_separator = pch.find(' ', first_separator);
+			method = pch.substr(0, first_separator);
 
+			path = pch.substr(first_separator, second_separator);
+			version = pch.substr(second_separator);
 		}
 		void PutField(string buffer) 
 		{
@@ -62,11 +85,14 @@ namespace MifuneCore
 		}
 
 	public:
+		std::string method;
+		std::string path;
+		std::string version;
 		std::map<string, string> RawHeaderFields;
+		std::string body;
 		httprequest(string buffer)
 		{
 			parse(buffer);
 		}
-
 	};
 }

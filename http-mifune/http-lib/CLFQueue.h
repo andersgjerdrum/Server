@@ -239,7 +239,7 @@ set_thr_id(size_t id)
 
 	private:
 		/*
-		* The most hot members are cacheline aligned to avoid
+		*TODO: The most hot members should be cacheline aligned to avoid
 		* False Sharing.
 		*/
 

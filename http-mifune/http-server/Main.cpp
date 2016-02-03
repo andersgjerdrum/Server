@@ -76,15 +76,17 @@ int main()
 
 void ConnectionHandler(CancelationToken canceled)
 {
+	char recvbuff[8092];
 	while (!canceled.IsCanceled())
 	{
 		auto item = RequestChannelQueue->pop();
 		auto socket = item->second;
 		auto x = R"(popped item)";
 		std::cout << x;
-		char recvbuff[8092];
 		int bytes = socket->Recieve(recvbuff, 0, 8092);
+
 		string str(recvbuff);
+		str.resize(bytes);
 		httprequest req(str);
 		std::cout << str;
 		x = R"(Recieved)";
