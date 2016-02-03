@@ -2,11 +2,14 @@
 #include "CppUnitTest.h"
 #include "httpstructs.h"
 #include "threadpool.cpp"
+#include "queue.h"
 #include <atomic>
+#include <thread>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 using namespace MifuneCore;
+using namespace std;
 namespace httpstuffunittests
 {		
 	static std::atomic<int> cnt = ATOMIC_VAR_INIT(0);
@@ -64,6 +67,26 @@ X-Forwarded-For: 192.168.10.1
 
 			Assert::AreEqual(cnt.load(), 100);
 
+		}
+		TEST_METHOD(queuetest1on1) 
+		{
+			Queue<int> q(10, 10);
+			thread tr1([&q]
+			{
+				for (int i = 0; i < 100;i++) {
+					q.push(i);
+				}
+			});
+
+			thread tr2([&q]
+			{
+				for (int i = 0; i < 100; i++) {
+					Assert::AreEqual(q.pop(), i);
+				}
+			});
+
+			tr1.join();
+			tr2.join();
 		}
 	};
 }

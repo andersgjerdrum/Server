@@ -88,7 +88,7 @@ namespace MifuneCore
 				}
 				last_tail_ = min;
 
-				if (thr_pos().head < last_tail_ + Q_SIZE)
+				if (thr_pos().head <= last_tail_ + Q_SIZE)
 					break;
 				_mm_pause();
 			}
@@ -120,7 +120,7 @@ namespace MifuneCore
 				}
 				last_head_ = min;
 
-				if (thr_pos().tail < last_head_)
+				if (thr_pos().tail <= last_head_)
 					break;
 				_mm_pause();
 			}

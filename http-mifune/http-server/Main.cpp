@@ -84,13 +84,14 @@ void ConnectionHandler(CancelationToken canceled)
 		auto x = R"(popped item)";
 		std::cout << x;
 		int bytes = socket->Recieve(recvbuff, 0, 8092);
-
-		string str(recvbuff);
-		str.resize(bytes);
-		httprequest req(str);
-		std::cout << str;
-		x = R"(Recieved)";
-		std::cout << x;
+		if (bytes > 0) {
+			string str(recvbuff);
+			str.resize(bytes);
+			httprequest req(str);
+			std::cout << str;
+			x = R"(Recieved)";
+			std::cout << x;
+		}
 	}
 	auto x = R"(canceled con)";
 	std::cout << x;
