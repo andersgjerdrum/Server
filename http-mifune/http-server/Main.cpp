@@ -5,9 +5,9 @@
 #include <thread>
 #include "socket.h"
 #include "ISocket.h"
-#include "ThreadPool.h"
 #include "httpstructs.h"
-#include "CLFQueue.h"
+#include "threadpool.cpp"
+#include "queue.h"
 
 /*
 Inspiration: http://www.techpowerup.com/forums/threads/c-c-sockets-faq-and-how-to-win-linux.56901/
@@ -21,13 +21,13 @@ using namespace MifuneCore;
 void ServerThread(CancelationToken canceled);
 void ConnectionHandler(CancelationToken canceled);
 
-static LockFreeQueue<std::pair<unsigned int, ISocket*>> *RequestChannelQueue;
+static Queue<std::pair<unsigned int, ISocket*>> *RequestChannelQueue;
 static ThreadPool *requestchannelThreadpool;
 
 void initializeWebServer(int threadpoolsize) 
 {
 	requestchannelThreadpool = new ThreadPool(threadpoolsize);
-	RequestChannelQueue = new LockFreeQueue<std::pair<unsigned int, ISocket*>>(1, threadpoolsize);
+	RequestChannelQueue = new Queue<std::pair<unsigned int, ISocket*>>(1, threadpoolsize);
 }
 
 CancelationToken startWebServer()
@@ -80,7 +80,7 @@ void ConnectionHandler(CancelationToken canceled)
 	while (!canceled.IsCanceled())
 	{
 		auto item = RequestChannelQueue->pop();
-		auto socket = item->second;
+		auto socket = item.second;
 		auto x = R"(popped item)";
 		std::cout << x;
 		int bytes = socket->Recieve(recvbuff, 0, 8092);
@@ -110,7 +110,7 @@ void ServerThread(CancelationToken canceled)
 	while (!canceled.IsCanceled())
 	{
 		sock.ListenSocket();
-		RequestChannelQueue->push(new std::pair<unsigned int, ISocket*>(sessionNumber++, sock.AcceptSocket()));
+		RequestChannelQueue->push(std::pair<unsigned int, ISocket*>(sessionNumber++, sock.AcceptSocket()));
 		auto x = R"(pushed item)";
 		std::cout << x;
 	}

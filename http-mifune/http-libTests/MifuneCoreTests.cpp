@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "httpstructs.h"
-#include "ThreadPool.h"
+#include "threadpool.cpp"
 #include <atomic>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

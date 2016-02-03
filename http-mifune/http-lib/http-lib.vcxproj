@@ -130,15 +130,15 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CLFQueue.h" />
+    <ClInclude Include="queue.h" />
     <ClInclude Include="httpstructs.h" />
     <ClInclude Include="ISocket.h" />
     <ClInclude Include="socket.h" />
-    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="threadpool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp" />
-    <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="threadpool.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
