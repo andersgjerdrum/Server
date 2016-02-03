@@ -22,7 +22,7 @@ namespace MifuneCore
 		Socket(int socket, sockaddr_in clientAddress);
 		Socket();
 		void CloseSocket();
-		void Connect(wchar_t ipAddr, int port);
+		void Connect(char *ipAddr, int port);
 		int Send(char * buffer, int startaddr, int buffersize);
 		int Recieve(char * buffer, int startaddr, int buffersize);
 		void BindSocket(unsigned int port);

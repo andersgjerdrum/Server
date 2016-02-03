@@ -54,11 +54,11 @@ namespace MifuneCore
 
 	}
 
-	void Socket::Connect(wchar_t ipAddr, int port)
+	void Socket::Connect(char *ipAddr, int port)
 	{
 		struct sockaddr_in destination;
 		destination.sin_port = htons(13374);
-		destination.sin_addr.s_addr = inet_addr("127.0.0.1");
+		destination.sin_addr.s_addr = inet_addr(ipAddr);
 		if (connect(this->socketDescriptor, (struct sockaddr *)&destination, sizeof(destination)) != 0)
 		{
 			if (this->socketDescriptor)
