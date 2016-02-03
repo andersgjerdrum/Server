@@ -46,6 +46,7 @@ namespace MifuneCore
 			//flush queue
 			for (size_t i = 0; i < workers.size(); ++i)
 			{
+				//Noop task
 				queue.push([] {return; });
 			}
 

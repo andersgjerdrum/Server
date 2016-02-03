@@ -13,7 +13,7 @@
 #define Q_SIZE	(32 * 1024)
 
 #define atomic_inc(ptr) InterlockedIncrement ((ptr))
-__declspec(thread) int tls_i = -1;
+__declspec(thread) unsigned long tls_i = ULONG_MAX;
 
 namespace MifuneCore
 {
@@ -38,6 +38,7 @@ namespace MifuneCore
 		unsigned long	tail_;
 		unsigned long	last_head_;
 		unsigned long	last_tail_;
+		unsigned long thrd_next;
 		std::vector<ThrPos>	thr_p_;
 		std::vector<T>	ptr_array_;
 		static const unsigned long Q_MASK = Q_SIZE - 1;
@@ -51,20 +52,21 @@ namespace MifuneCore
 			last_head_(0),
 			last_tail_(0),
 			ptr_array_(Q_SIZE),
-			thr_p_(max(n_consumers_, n_producers_))
+			thr_p_(max(n_consumers_, n_producers_) + 2),
+			thrd_next(0)
 		{
 		}
 		ThrPos&	thr_pos()
 		{
-			assert(thr_id() < max(n_consumers_, n_producers_));
-			return thr_p_[thr_id()];
+			if (tls_i == ULONG_MAX)
+			{
+				tls_i = atomic_inc(&thrd_next);
+			}
+
+			assert(tls_i < max(n_consumers_, n_producers_) + 2);
+			return thr_p_[tls_i];
 		}
-		int thr_id()
-		{
-			if (tls_i < 0)
-				tls_i = TlsAlloc() % max(n_consumers_, n_producers_);
-			return tls_i;
-		}
+	
 		void push(T ptr)
 		{
 			thr_pos().head = head_;
@@ -74,7 +76,7 @@ namespace MifuneCore
 			{
 				auto min = tail_;
 
-				for (size_t i = 0; i < n_consumers_; ++i) {
+				for (size_t i = 2; i < n_consumers_ + 2; ++i) {
 					auto tmp_t = thr_p_[i].tail;
 
 					// Force compiler to use tmp_h exactly once.
@@ -106,7 +108,7 @@ namespace MifuneCore
 			{
 				auto min = head_;
 
-				for (size_t i = 0; i < n_producers_; ++i) {
+				for (size_t i = 2; i < n_producers_ + 2; ++i) {
 					auto tmp_h = thr_p_[i].head;
 
 					// Force compiler to use tmp_h exactly once.
