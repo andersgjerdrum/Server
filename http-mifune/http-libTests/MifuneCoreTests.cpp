@@ -88,5 +88,27 @@ X-Forwarded-For: 192.168.10.1
 			tr1.join();
 			tr2.join();
 		}
+		TEST_METHOD(queuetestmanyonmany)
+		{
+			Queue<int> q(10, 10);
+			vector<thread> threads(10);
+			for (int num = 0; num < 10; num++) 
+			{
+				threads[num] = thread([&q]
+				{
+					for (int i = 0; i < 100000; i++) {
+						q.push(i);
+						q.pop();
+					}
+				});
+			}
+			
+			
+			for (int num = 0; num < 10; num++)
+			{
+				threads[num].join();
+			}
+		}
+
 	};
 }
