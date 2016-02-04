@@ -11,10 +11,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #endif
-#include "ISocket.h"
+#include "socket.h"
 namespace MifuneCore 
 {
-	class Socket : public ISocket
+	class Socket
 	{
 		sockaddr_in clientAddress;
 		int socketDescriptor = -1 ;
@@ -28,6 +28,6 @@ namespace MifuneCore
 		void BindSocket(unsigned int port);
 		void OpenSocket();
 		void ListenSocket();
-		ISocket* AcceptSocket();
+		Socket* AcceptSocket();
 	};
 }

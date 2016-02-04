@@ -94,7 +94,7 @@ namespace MifuneCore
 		}
 	}
 
-	ISocket* Socket::AcceptSocket()
+	Socket* Socket::AcceptSocket()
 	{
 		struct sockaddr_in  clientAddress;
 		int clientSize = sizeof(clientAddress);

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "httpstructs.h"
-#include "threadpool.cpp"
+#include "threadpool.h"
 #include "queue.h"
 #include <atomic>
 #include <thread>
@@ -20,7 +20,8 @@ namespace httpstuffunittests
 		
 		TEST_METHOD(httpstructs)
 		{
-			httprequest req(R"foo(GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1
+			httprequest req;
+			req.parse(R"foo(GET /tutorials/other/top-20-mysql-best-practices/ HTTP/1.1
 Host: net.tutsplus.com
 User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
@@ -102,7 +103,6 @@ X-Forwarded-For: 192.168.10.1
 					}
 				});
 			}
-			
 			
 			for (int num = 0; num < 10; num++)
 			{

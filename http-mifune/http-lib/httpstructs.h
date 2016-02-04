@@ -33,17 +33,20 @@ namespace MifuneCore
 
 
 	};
-	enum HttpRequestMethodType {
-		GET,
-		POST,
-		PUT
-	};
+	
+#define HTTP_GET  1
+#define HTTP_POST  2
+#define HTTP_PUT  3
 
+	std::map<string, int> RequestMethods = { 
+		{"GET", HTTP_GET },
+		{"POST", HTTP_POST },
+		{"PUT",	HTTP_PUT } 
+	};
 
 	class httprequest 
 	{	
-	private:
-		
+	public:
 		void parse(string buffer) 
 		{
 			std::stringstream stream(buffer);
@@ -64,12 +67,14 @@ namespace MifuneCore
 				CurrentByte = stream.tellg();
 			}
 		}
+	private:
 		void ExtractRequestLine(std::stringstream &stream) {
 			string pch;
 			std::getline(stream, pch);
 			int first_separator = pch.find_first_of(' ');
 			int second_separator = pch.find(' ', first_separator);
-			method = pch.substr(0, first_separator);
+
+			method = RequestMethods[pch.substr(0, first_separator)];
 
 			path = pch.substr(first_separator, second_separator);
 			version = pch.substr(second_separator);
@@ -85,14 +90,13 @@ namespace MifuneCore
 		}
 
 	public:
-		std::string method;
+		int method;
 		std::string path;
 		std::string version;
 		std::map<string, string> RawHeaderFields;
 		std::string body;
-		httprequest(string buffer)
+		httprequest()
 		{
-			parse(buffer);
 		}
 	};
 }

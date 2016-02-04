@@ -4,9 +4,8 @@
 #include <map>
 #include <thread>
 #include "socket.h"
-#include "ISocket.h"
 #include "httpstructs.h"
-#include "threadpool.cpp"
+#include "threadpool.h"
 #include "queue.h"
 
 /*
@@ -20,14 +19,17 @@ using namespace MifuneCore;
 
 void ServerThread(CancelationToken canceled);
 void ConnectionHandler(CancelationToken canceled);
+void RetrieveRequest(httprequest& req, Socket *socket);
+void RequestHandler(httprequest &req, Socket *socket);
 
-static Queue<std::pair<unsigned int, ISocket*>> *RequestChannelQueue;
+
+static Queue<std::pair<unsigned int, Socket*>> *RequestChannelQueue;
 static ThreadPool *requestchannelThreadpool;
 
 void initializeWebServer(int threadpoolsize) 
 {
 	requestchannelThreadpool = new ThreadPool(threadpoolsize);
-	RequestChannelQueue = new Queue<std::pair<unsigned int, ISocket*>>(1, threadpoolsize);
+	RequestChannelQueue = new Queue<std::pair<unsigned int, Socket*>>(1, threadpoolsize);
 }
 
 CancelationToken startWebServer()
@@ -76,28 +78,60 @@ int main()
 
 void ConnectionHandler(CancelationToken canceled)
 {
-	char recvbuff[8092];
 	while (!canceled.IsCanceled())
 	{
 		auto item = RequestChannelQueue->pop();
 		auto socket = item.second;
 		auto x = R"(popped item)";
 		std::cout << x;
-		int bytes = socket->Recieve(recvbuff, 0, 8092);
-		if (bytes > 0) {
-			string str(recvbuff);
-			str.resize(bytes);
-			httprequest req(str);
-			std::cout << str;
-			x = R"(Recieved)";
-			std::cout << x;
-		}
+		httprequest req;
+		RetrieveRequest(req, socket);
+		RequestHandler(req,socket);
 	}
-	auto x = R"(canceled con)";
+
+	auto x = R"(canceled connection)";
 	std::cout << x;
 }
 
+void RequestHandler(httprequest &req, Socket *socket)
+{
+	switch (req.method) 
+	{
+		case HTTP_GET: 
+		{
+			
+		}
+	}
+}
 
+
+
+#define MAX_TCP_CHUNKBUFFER 8092
+void RetrieveRequest(httprequest& req, Socket *socket)
+{
+	char recvbuff[MAX_TCP_CHUNKBUFFER];
+	int bytes = 0;
+	int total = 0;
+	do {
+
+		bytes = socket->Recieve(recvbuff, total, MAX_TCP_CHUNKBUFFER);
+		total += bytes;
+	} while (bytes < 0 && total < MAX_TCP_CHUNKBUFFER);
+	
+	if (total <= 0) 
+	{
+		return;
+	}
+	assert(total < MAX_TCP_CHUNKBUFFER);
+	
+	string str(recvbuff);
+	str.resize(total);
+
+	req.parse(str);
+	std::cout << str;
+	auto x = R"(Recieved)";
+	std::cout << x;
+}
 
 
 void ServerThread(CancelationToken canceled)
@@ -111,7 +145,7 @@ void ServerThread(CancelationToken canceled)
 	while (!canceled.IsCanceled())
 	{
 		sock.ListenSocket();
-		RequestChannelQueue->push(std::pair<unsigned int, ISocket*>(sessionNumber++, sock.AcceptSocket()));
+		RequestChannelQueue->push(std::pair<unsigned int, Socket*>(sessionNumber++, sock.AcceptSocket()));
 		auto x = R"(pushed item)";
 		std::cout << x;
 	}
