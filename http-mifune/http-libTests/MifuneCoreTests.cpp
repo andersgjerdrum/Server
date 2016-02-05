@@ -62,7 +62,7 @@ X-Forwarded-For: 192.168.10.1
 				});
 			}
 			//wait for queue drainage
-			_sleep(1000);
+			_sleep(3000);
 			delete thrdpl;
 
 
